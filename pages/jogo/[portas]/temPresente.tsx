@@ -7,17 +7,36 @@ import {useRouter} from 'next/router'
 export default function Jogo(){
 
     const [portas, setPortas] = useState([]);
+    const [valido, setValido] = useState(false);
     const router = useRouter()
 
     useEffect(()=>{
+      let min = Math.ceil(1);
+      let max = Math.floor(+router.query.portas);
+    
         const portas =  +router.query.portas
-        const temPresente =   +router.query.temPresente
+        const temPresente =   Math.floor(Math.random() * (max - min)) + min
         setPortas(criarPorta(portas,temPresente))
     },[router?.query])
 
+    useEffect(()=>{
+      
+      let min = Math.ceil(1);
+      let max = Math.floor(+router.query.portas);
+
+      const portas =  +router.query.portas
+      const temPresente =   Math.floor(Math.random() * (max - min)) + min
+
+      const qtdePortasValidas = portas>=3 && portas<=100
+      const temPresenteValido = temPresente>=1 && temPresente<=portas
+      setValido(qtdePortasValidas && temPresenteValido)
+
+    },[portas])
+
+
     
     function renderizarPorta() {
-      return portas.map(porta => {
+      return valido && portas.map(porta => {
         return (
           <Porta
             key={porta.numero}
@@ -31,10 +50,10 @@ export default function Jogo(){
         
         <div className={styles.jogo}>
             <div className={styles.portas}>
-                     {renderizarPorta()}
+                     {valido?renderizarPorta():<h1>Valores inválidos</h1>}
             </div>
             <div className={styles.botoes}>
-                    <Link href="/">
+                    <Link href="/" passHref>
                         <button>Reiniciar</button>
                     </Link>
             </div>
